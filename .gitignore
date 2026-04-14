@@ -1,0 +1,9 @@
+_pycache_/
+*.pyc
+*.pyo
+*.pyd
+.env
+Lib/
+Scripts/
+uploadimages/
+models/*.keras

@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PhytoCare - Plant Disease Recognition</title>
+  <link rel="icon" href="../static/images/logo.svg" type="image/svg+xml">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../static/css/bootstrap.min.css">
+  <link rel="stylesheet" href="../static/css/style.css">
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg">
+    <div class="container">
+      <a class="navbar-brand" href="/">
+        <!-- Leaf + Shield Vector Logo -->
+        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#2D5016" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            <path d="M12 16V8"></path>
+            <path d="M12 12c-2-2-4-2-4 0 0 2 4 2 4 4"></path>
+            <path d="M12 10c2-2 4-2 4 0 0 2-4 2-4 4"></path>
+        </svg>
+        PhytoCare
+      </a>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <header class="hero-section">
+    <div class="container">
+      <span class="pill-tag">PLANT HEALTH DIAGNOSTICS</span>
+      <h1 class="hero-title">Detect plant diseases instantly</h1>
+      <p class="hero-subtitle">Upload a clear photo of a plant leaf and let our advanced AI model identify diseases, provide confidence scores, and suggest effective treatments.</p>
+      
+      <div class="hero-stats">
+          <div class="stat-pill"><span class="stat-accent">🌿</span> 38+ Disease Types Detected</div>
+          <div class="stat-pill"><span class="stat-accent">✓</span> 95% Model Accuracy</div>
+          <div class="stat-pill"><span class="stat-accent">⚡</span> &lt;2s Diagnosis Time</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Card Container -->
+  <main class="container">
+    <div class="saas-card">
+      
+      <!-- Upload Section -->
+      {% if not result %}
+      <form action="/upload/" method="POST" enctype="multipart/form-data" id="uploadForm">
+        <div class="upload-body">
+            <div class="upload-zone" id="dropZone">
+            <input type="file" accept="image/png, image/jpeg, image/jpg" name="img" id="fileInput" required>
+            <div class="upload-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="17 8 12 3 7 8"></polyline>
+                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                </svg>
+            </div>
+            <div class="upload-text">Drop your leaf image here</div>
+            <div class="upload-subtext">or <span class="browse-link">browse files</span></div>
+            <div class="file-pills">
+                <span class="file-pill">PNG</span>
+                <span class="file-pill">JPG</span>
+                <span class="file-pill">JPEG</span>
+            </div>
+            </div>
+        </div>
+        
+        <div class="upload-footer">
+            <div class="file-info" id="fileInfo">
+                <span id="fileName">No file selected</span> (<span id="fileSize">0 KB</span>)
+            </div>
+            <button type="submit" class="btn-analyze" id="analyzeBtn">Analyze Leaf Image</button>
+        </div>
+      </form>
+      {% endif %}
+
+      <!-- Results Section -->
+      {% if result %}
+      {% if prediction['is_valid'] %}
+      <div class="result-body">
+        <div class="result-top-split">
+            <div class="result-image-wrapper">
+                <img src="{{imagepath}}" alt="uploaded image" class="result-image">
+            </div>
+            <div class="result-header">
+                <h2>{{prediction['name'].replace('_', ' ')}}</h2>
+                
+                <div class="badge-group">
+                    <span class="result-badge badge-confidence">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        Confidence: {{prediction['confidence']}}
+                    </span>
+                    <span class="result-badge badge-severity {{prediction['severity'] | lower}}">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                        Severity: {{prediction['severity']}}
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-cards-wrapper">
+            <div class="info-card">
+                <div class="info-card-title">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                    Cause
+                </div>
+                <p>{{prediction['cause']}}</p>
+            </div>
+            <div class="info-card">
+                <div class="info-card-title">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>
+                    Treatment / Cure
+                </div>
+                
+                <div class="treatment-section">
+                    <div class="treatment-label">1. Immediate Action</div>
+                    <p>{{prediction['cure']}}</p>
+                </div>
+                
+                <hr class="treatment-divider">
+                
+                <div class="treatment-section">
+                    <div class="treatment-label">2. Recommended Fungicides</div>
+                    <p>
+                        {% if prediction.get('fungicides') %}
+                            {{prediction['fungicides']}}
+                        {% else %}
+                            Mancozeb 75% WP, Metalaxyl + Mancozeb (Ridomil Gold), Cymoxanil + Mancozeb (Curzate M8)
+                        {% endif %}
+                    </p>
+                </div>
+
+                <hr class="treatment-divider">
+                
+                <div class="treatment-section">
+                    <div class="treatment-label">3. Recommended Pesticides / Sprays</div>
+                    <p>
+                        {% if prediction.get('pesticides') %}
+                            {{prediction['pesticides']}}
+                        {% else %}
+                            Chlorothalonil (Bravo), Copper Oxychloride spray, Dimethomorph (Acrobat)
+                        {% endif %}
+                    </p>
+                </div>
+
+                <hr class="treatment-divider">
+
+                <div class="treatment-section">
+                    <div class="treatment-label">4. Application Tips</div>
+                    <p>Spray every 7–10 days during wet/humid conditions. Apply in early morning or evening. Avoid overhead irrigation to reduce leaf wetness.</p>
+                </div>
+            </div>
+            <div class="info-card">
+                <div class="info-card-title">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                    Symptoms
+                </div>
+                <p>
+                    {% if prediction.get('symptoms') %}
+                        {{prediction['symptoms']}}
+                    {% else %}
+                        Common symptoms include yellowing, spots, wilting or discoloration of leaves.
+                    {% endif %}
+                </p>
+            </div>
+            <div class="info-card">
+                <div class="info-card-title">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+                    Severity Explained
+                </div>
+                <p>
+                    {% if prediction.get('severity_info') %}
+                        {{prediction['severity_info']}}
+                    {% else %}
+                        {% if prediction['severity'] == "High" %}
+                            This disease spreads rapidly and can destroy entire crops if untreated within 48–72 hours.
+                        {% elif prediction['severity'] == "Medium" %}
+                            Moderate impact. Treat within a week to prevent further spread.
+                        {% else %}
+                            Early stage or mild infection. Monitor closely and apply preventive measures.
+                        {% endif %}
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+        
+        <a href="/" class="reload-link">← Analyze another leaf</a>
+      </div>
+      {% else %}
+      <div style="text-align:center; background:#fff; border-radius:16px; padding:48px 24px; max-width:600px; margin:0 auto; border:1px solid #e0ead0; margin-bottom: 2rem;">
+        <div style="font-size:52px; margin-bottom:16px;">⚠️</div>
+        <h2 style="color:#2D5016; font-size:22px; font-weight:700; margin-bottom:10px;">No plant leaf detected</h2>
+        <p style="color:#6b7280; font-size:15px; line-height:1.6; margin-bottom:24px;">Please upload a clear image of a plant leaf.<br>Make sure the leaf is fully visible and well-lit.</p>
+        <a href="/" style="background:#2D5016; color:#fff; padding:12px 32px; border-radius:8px; font-size:15px; font-weight:600; text-decoration:none;">Try Again</a>
+      </div>
+      {% endif %}
+      {% endif %}
+
+    </div>
+  </main>
+
+  <!-- How it Works section -->
+  <section class="how-section">
+    <div class="how-container">
+        <h3 class="how-h3">How it works</h3>
+        <div class="steps-wrapper">
+            <div class="step">
+                <div class="step-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                </div>
+                <div class="step-title">Upload photo</div>
+                <div class="step-description">Take a clear close-up of the affected leaf in natural light</div>
+            </div>
+            <div class="step">
+                <div class="step-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                </div>
+                <div class="step-title">AI Analysis</div>
+                <div class="step-description">Our deep learning model scans for 38+ diseases across major crop types</div>
+            </div>
+            <div class="step">
+                <div class="step-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                </div>
+                <div class="step-title">Get diagnosis</div>
+                <div class="step-description">Receive disease name, confidence score, cause and treatment instantly</div>
+            </div>
+        </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    © 2026 PhytoCare · Powered by Deep Learning
+  </footer>
+
+  <script src="../static/js/bootstrap.bundle.min.js"></script>
+  
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const fileInfo = document.getElementById('fileInfo');
+        const fileNameSpan = document.getElementById('fileName');
+        const fileSizeSpan = document.getElementById('fileSize');
+
+        if(dropZone && fileInput) {
+            fileInput.addEventListener('change', function(e) {
+                handleFiles(e.target.files);
+            });
+
+            dropZone.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                dropZone.classList.add('dragover');
+            });
+
+            dropZone.addEventListener('dragleave', function(e) {
+                e.preventDefault();
+                dropZone.classList.remove('dragover');
+            });
+
+            dropZone.addEventListener('drop', function(e) {
+                e.preventDefault();
+                dropZone.classList.remove('dragover');
+                if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                    fileInput.files = e.dataTransfer.files;
+                    handleFiles(e.dataTransfer.files);
+                }
+            });
+        }
+
+        function handleFiles(files) {
+            if (files.length > 0) {
+                const file = files[0];
+                fileNameSpan.textContent = file.name;
+                
+                let sizeText = '';
+                if (file.size > 1024 * 1024) {
+                    sizeText = (file.size / (1024 * 1024)).toFixed(2) + ' MB';
+                } else {
+                    sizeText = (file.size / 1024).toFixed(2) + ' KB';
+                }
+                fileSizeSpan.textContent = sizeText;
+                
+                fileInfo.style.display = 'block';
+            }
+        }
+    });
+  </script>
+</body>
+</html>
