@@ -90,11 +90,6 @@ http://127.0.0.1:5000/
 
 ---
 
-## 📸 Screenshots
-
-(Add your project screenshots here)
-
----
 
 ## 🎯 Future Scope
 
@@ -107,7 +102,7 @@ http://127.0.0.1:5000/
 
 ## 👨‍💻 Author
 
-**Kunal Prasad**
+**Priyanshu kumar**
 B.Tech IT (Final Year)
 
 ---
